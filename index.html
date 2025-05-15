@@ -53,13 +53,29 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#welcome-to-mkdocs" class="nav-link">Welcome to MkDocs</a>
+            <li class="nav-item" data-bs-level="1"><a href="#lr1" class="nav-link">LR1. Сервис управления хакатонами</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#commands" class="nav-link">Commands</a>
+            <li class="nav-item" data-bs-level="2"><a href="#1" class="nav-link">1. Архитектура и стек технологий</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#project-layout" class="nav-link">Project layout</a>
+            <li class="nav-item" data-bs-level="2"><a href="#2" class="nav-link">2. Схема данных и связи</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#3" class="nav-link">3. Аутентификация и пользователи</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#4-crud" class="nav-link">4. CRUD для основных сущностей</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#5" class="nav-link">5. Примеры использования</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#6" class="nav-link">6. Миграции и деплой</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -70,20 +86,318 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="welcome-to-mkdocs">Welcome to MkDocs</h1>
-<p>For full documentation visit <a href="https://www.mkdocs.org">mkdocs.org</a>.</p>
-<h2 id="commands">Commands</h2>
+<h1 id="lr1">LR1. Сервис управления хакатонами</h1>
+<p>Документация лабораторной работы № 1 по разработке REST-сервиса для управления хакатонами.
+В этом проекте мы реализовали бэкенд на FastAPI + SQLModel, обеспечивающий полную цепочку:</p>
+<ol>
+<li>Регистрация и аутентификация пользователей  </li>
+<li>Создание и управление хакатонами  </li>
+<li>Формирование команд участников  </li>
+<li>Создание и решение задач (problems &amp; submissions)  </li>
+<li>Хранение и выдача результатов  </li>
+</ol>
+<hr />
+<h2 id="1">1. Архитектура и стек технологий</h2>
 <ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs -h</code> - Print help message and exit.</li>
+<li><strong>FastAPI</strong> — асинхронный веб-фреймворк на Python  </li>
+<li><strong>SQLModel</strong> (на базе SQLAlchemy) — декларативные ORM-модели + pydantic-схемы  </li>
+<li><strong>PostgreSQL</strong> — реляционная база данных  </li>
+<li><strong>Alembic</strong> — управление версиями схемы БД (миграции)  </li>
+<li><strong>JWT</strong> — токены для авторизации API  </li>
+<li><strong>Uvicorn</strong> — ASGI-сервер для запуска приложения  </li>
 </ul>
-<h2 id="project-layout">Project layout</h2>
-<pre><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
+<p>Структура проекта:</p>
+<ul>
+<li>main.py                 </li>
+<li>Все эндпоинты приложения</li>
+<li>models.py               </li>
+<li>QLModel-модели + DTO-схемы</li>
+<li>connection.py           </li>
+<li>Инициализация DB + сессий</li>
+<li>migrations/             </li>
+<li>Alembic-миграции</li>
+</ul>
+<hr />
+<h2 id="2">2. Схема данных и связи</h2>
+<h3 id="21">2.1. Таблицы и модели</h3>
+<pre><code class="language-python"># models.py
+
+class User(SQLModel, table=True):
+    id: int
+    username: str
+    email: str
+    hashed_password: str
+    teams: List[Team]            # M-to-M через TeamMemberLink
+    submissions: List[Submission]
+
+class Hackathon(SQLModel, table=True):
+    id: int
+    title: str
+    description: Optional[str]
+    start_date: Optional[str]
+    end_date: Optional[str]
+    teams: List[Team]            # 1-to-N
+    problems: List[Problem]      # 1-to-N
+
+class Team(SQLModel, table=True):
+    id: int
+    name: str
+    hackathon_id: int            # FK → Hackathon.id
+    members: List[User]          # M-to-M через TeamMemberLink
+    submissions: List[Submission]# 1-to-N
+
+class Problem(SQLModel, table=True):
+    id: int
+    title: str
+    description: Optional[str]
+    hackathon_id: int            # FK → Hackathon.id
+    submissions: List[Submission]# 1-to-N
+
+class Submission(SQLModel, table=True):
+    id: int
+    user_id: int                 # FK → User.id
+    team_id: int                 # FK → Team.id
+    hackathon_id: int            # FK → Hackathon.id
+    problem_id: int              # FK → Problem.id
+    timestamp: Optional[str]
+    result: Optional[str]
+</code></pre>
+<h2 id="3">3. Аутентификация и пользователи</h2>
+<h3 id="31">3.1. Регистрация</h3>
+<pre><code>•   POST /auth/register
+•   Параметры (form/query):
+•   username: str
+•   email: str
+•   password: str
+•   Возвращает: { msg: "Registered" }
+</code></pre>
+<h3 id="32">3.2. Логин</h3>
+<pre><code>•   POST /auth/login
+•   Параметры:
+•   username: str
+•   password: str
+•   Возвращает: { access_token: "&lt;JWT&gt;" }
+</code></pre>
+<h3 id="33">3.3. Работа с токеном</h3>
+<ul>
+<li>Все защищённые роуты требуют заголовок</li>
+</ul>
+<pre><code>Authorization: Bearer &lt;JWT&gt;
+</code></pre>
+<p>⸻</p>
+<h2 id="4-crud">4. CRUD для основных сущностей</h2>
+<h3 id="41">4.1. Хакатоны</h3>
+<table>
+<thead>
+<tr>
+<th>Метод</th>
+<th>Путь</th>
+<th>Тело запроса (JSON)</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/hackathons</code></td>
+<td><code>{ title, description?, start_date?, end_date? }</code></td>
+<td>Создать новый хакатон</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/hackathons</code></td>
+<td>—</td>
+<td>Получить список всех хакатонов</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/hackathons/{id}</code></td>
+<td>—</td>
+<td>Получить детали конкретного хакатона</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/hackathons/{id}</code></td>
+<td>Любые из полей создания</td>
+<td>Обновить хакатон</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/hackathons/{id}</code></td>
+<td>—</td>
+<td>Удалить хакатон</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42">4.2. Команды</h3>
+<table>
+<thead>
+<tr>
+<th>Метод</th>
+<th>Путь</th>
+<th>Тело запроса (JSON)</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/teams</code></td>
+<td><code>{ name, hackathon_id, members: [user_id,…] }</code></td>
+<td>Создать команду</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/teams</code></td>
+<td>—</td>
+<td>Получить список всех команд</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/teams/{id}</code></td>
+<td>—</td>
+<td>Получить детали конкретной команды</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/teams/{id}</code></td>
+<td><code>{ name?, hackathon_id?, members? }</code></td>
+<td>Обновить команду</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/teams/{id}</code></td>
+<td>—</td>
+<td>Удалить команду</td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-problems">4.3. Задачи (Problems)</h3>
+<table>
+<thead>
+<tr>
+<th>Метод</th>
+<th>Путь</th>
+<th>Тело запроса (JSON)</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/problems</code></td>
+<td><code>{ title, description?, hackathon_id }</code></td>
+<td>Создать задачу</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/problems</code></td>
+<td>—</td>
+<td>Получить список всех задач</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/problems/{id}</code></td>
+<td>—</td>
+<td>Получить детали конкретной задачи</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/problems/{id}</code></td>
+<td><code>{ title?, description?, hackathon_id? }</code></td>
+<td>Обновить задачу</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/problems/{id}</code></td>
+<td>—</td>
+<td>Удалить задачу</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-submissions">4.4. Решения (Submissions)</h3>
+<table>
+<thead>
+<tr>
+<th>Метод</th>
+<th>Путь</th>
+<th>Тело запроса (JSON)</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/submissions</code></td>
+<td><code>{ user_id, team_id, hackathon_id, problem_id, timestamp?, result? }</code></td>
+<td>Отправить решение</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/submissions</code></td>
+<td>—</td>
+<td>Получить список решений</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/submissions/{id}</code></td>
+<td>—</td>
+<td>Получить детали  решения</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/submissions/{id}</code></td>
+<td>Любые поля создания</td>
+<td>Обновить   решение</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/submissions/{id}</code></td>
+<td>—</td>
+<td>Удалить решение</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5">5. Примеры использования</h2>
+<h3 id="51">5.1. Регистрация и получение токена</h3>
+<pre><code class="language-bash">curl -X POST http://127.0.0.1:8000/auth/register \
+  -d &quot;username=alice&quot; -d &quot;email=alice@mail.com&quot; -d &quot;password=secret&quot;
+
+curl -X POST http://127.0.0.1:8000/auth/login \
+  -d &quot;username=alice&quot; -d &quot;password=secret&quot; | jq .
+</code></pre>
+<h3 id="52">5.2. Создание хакатона</h3>
+<pre><code class="language-bash">TOKEN=&lt;твой_JWT&gt;
+curl -X POST http://127.0.0.1:8000/hackathons \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;title&quot;:&quot;AI-Challenge&quot;,&quot;description&quot;:&quot;Машинное обучение&quot;,&quot;start_date&quot;:&quot;2025-06-10&quot;,&quot;end_date&quot;:&quot;2025-06-12&quot;}'
+</code></pre>
+<h3 id="53">5.3. Формирование команды</h3>
+<p>```bash
+curl -X POST http://127.0.0.1:8000/teams \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"DreamTeam","hackathon_id":1,"members":[1,2,3]}'</p>
+<pre><code>
+### 5.4. Отправка решения
+
+```bash
+curl -X POST http://127.0.0.1:8000/submissions \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;user_id&quot;:1,&quot;team_id&quot;:1,&quot;hackathon_id&quot;:1,&quot;problem_id&quot;:2,&quot;result&quot;:&quot;accepted&quot;}'
+</code></pre>
+<p>⸻</p>
+<h2 id="6">6. Миграции и деплой</h2>
+<p>При изменении моделей запускайте:</p>
+<pre><code>alembic revision --autogenerate -m &quot;описание изменений&quot;
+alembic upgrade head
+</code></pre>
+<p>Для очистки БД вручную можете сбросить схему:</p>
+<pre><code>DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
 </code></pre></div>
             </div>
         </div>
@@ -166,5 +480,5 @@ docs/
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-05-15 17:28:51.140103+00:00
+Build Date UTC : 2025-05-15 18:42:04.273773+00:00
 -->
