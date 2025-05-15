@@ -362,30 +362,30 @@ class Submission(SQLModel, table=True):
 
 curl -X POST http://127.0.0.1:8000/auth/login \
   -d &quot;username=alice&quot; -d &quot;password=secret&quot; | jq .
+  ```
+
+
+### 5.2. Создание хакатона
+
 </code></pre>
-<h3 id="52">5.2. Создание хакатона</h3>
-<pre><code>TOKEN=&lt;твой_JWT&gt;
+<p>TOKEN=&lt;твой_JWT&gt;
 curl -X POST http://127.0.0.1:8000/hackathons \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"AI-Challenge","description":"Машинное обучение","start_date":"2025-06-10","end_date":"2025-06-12"}'
+  ```</p>
+<h3 id="53">5.3. Формирование команды</h3>
+<p><code>curl -X POST http://127.0.0.1:8000/teams \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"DreamTeam","hackathon_id":1,"members":[1,2,3]}'</code></p>
+<h3 id="54">5.4. Отправка решения</h3>
+<pre><code>curl -X POST http://127.0.0.1:8000/submissions \
   -H &quot;Authorization: Bearer $TOKEN&quot; \
   -H &quot;Content-Type: application/json&quot; \
-  -d '{&quot;title&quot;:&quot;AI-Challenge&quot;,&quot;description&quot;:&quot;Машинное обучение&quot;,&quot;start_date&quot;:&quot;2025-06-10&quot;,&quot;end_date&quot;:&quot;2025-06-12&quot;}'
-</code></pre>
-<h3 id="53">5.3. Формирование команды</h3>
-<p>```
-curl -X POST http://127.0.0.1:8000/teams \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"DreamTeam","hackathon_id":1,"members":[1,2,3]}'</p>
-<pre><code>
+  -d '{&quot;user_id&quot;:1,&quot;team_id&quot;:1,&quot;hackathon_id&quot;:1,&quot;problem_id&quot;:2,&quot;result&quot;:&quot;accepted&quot;}'
+  ```
 
-### 5.4. Отправка решения
-
-</code></pre>
-<p>curl -X POST http://127.0.0.1:8000/submissions \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"user_id":1,"team_id":1,"hackathon_id":1,"problem_id":2,"result":"accepted"}'</p>
-<pre><code>
 ⸻
 
 ## 6. Миграции и деплой
