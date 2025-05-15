@@ -75,10 +75,6 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#6" class="nav-link">6. Миграции и деплой</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -361,21 +357,21 @@ class Submission(SQLModel, table=True):
 <hr />
 <h2 id="5">5. Примеры использования</h2>
 <h3 id="51">5.1. Регистрация и получение токена</h3>
-<pre><code class="language-bash">curl -X POST http://127.0.0.1:8000/auth/register \
+<pre><code>curl -X POST http://127.0.0.1:8000/auth/register \
   -d &quot;username=alice&quot; -d &quot;email=alice@mail.com&quot; -d &quot;password=secret&quot;
 
 curl -X POST http://127.0.0.1:8000/auth/login \
   -d &quot;username=alice&quot; -d &quot;password=secret&quot; | jq .
 </code></pre>
 <h3 id="52">5.2. Создание хакатона</h3>
-<pre><code class="language-bash">TOKEN=&lt;твой_JWT&gt;
+<pre><code>TOKEN=&lt;твой_JWT&gt;
 curl -X POST http://127.0.0.1:8000/hackathons \
   -H &quot;Authorization: Bearer $TOKEN&quot; \
   -H &quot;Content-Type: application/json&quot; \
   -d '{&quot;title&quot;:&quot;AI-Challenge&quot;,&quot;description&quot;:&quot;Машинное обучение&quot;,&quot;start_date&quot;:&quot;2025-06-10&quot;,&quot;end_date&quot;:&quot;2025-06-12&quot;}'
 </code></pre>
 <h3 id="53">5.3. Формирование команды</h3>
-<p>```bash
+<p>```
 curl -X POST http://127.0.0.1:8000/teams \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
@@ -383,22 +379,26 @@ curl -X POST http://127.0.0.1:8000/teams \
 <pre><code>
 ### 5.4. Отправка решения
 
-```bash
-curl -X POST http://127.0.0.1:8000/submissions \
-  -H &quot;Authorization: Bearer $TOKEN&quot; \
-  -H &quot;Content-Type: application/json&quot; \
-  -d '{&quot;user_id&quot;:1,&quot;team_id&quot;:1,&quot;hackathon_id&quot;:1,&quot;problem_id&quot;:2,&quot;result&quot;:&quot;accepted&quot;}'
 </code></pre>
-<p>⸻</p>
-<h2 id="6">6. Миграции и деплой</h2>
-<p>При изменении моделей запускайте:</p>
-<pre><code>alembic revision --autogenerate -m &quot;описание изменений&quot;
-alembic upgrade head
+<p>curl -X POST http://127.0.0.1:8000/submissions \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":1,"team_id":1,"hackathon_id":1,"problem_id":2,"result":"accepted"}'</p>
+<pre><code>
+⸻
+
+## 6. Миграции и деплой
+
+При изменении моделей запускайте:
 </code></pre>
-<p>Для очистки БД вручную можете сбросить схему:</p>
-<pre><code>DROP SCHEMA public CASCADE;
+<p>alembic revision --autogenerate -m "описание изменений"
+alembic upgrade head</p>
+<pre><code>
+Для очистки БД вручную можете сбросить схему:
+</code></pre>
+<p>DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
-</code></pre></div>
+```</p></div>
             </div>
         </div>
 
