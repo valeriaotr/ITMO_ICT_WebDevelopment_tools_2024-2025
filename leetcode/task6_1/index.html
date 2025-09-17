@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Leetcode_task4 - WEB Docs</title>
+        <title>Leetcode_lr3_6 - WEB Docs</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -53,7 +53,7 @@
                                 <a href="../task3/" class="nav-link">Leetcode_task3</a>
                             </li>
                             <li class="nav-item">
-                                <a href="./" class="nav-link active" aria-current="page">Leetcode_task4</a>
+                                <a href="../task4/" class="nav-link">Leetcode_task4</a>
                             </li>
                             <li class="nav-item">
                                 <a href="../task5/" class="nav-link">Leetcode_task5</a>
@@ -77,7 +77,7 @@
                                 <a href="../task5_1/" class="nav-link">Leetcode_lr3_5</a>
                             </li>
                             <li class="nav-item">
-                                <a href="../task6_1/" class="nav-link">Leetcode_lr3_6</a>
+                                <a href="./" class="nav-link active" aria-current="page">Leetcode_lr3_6</a>
                             </li>
                         </ul>
 
@@ -88,12 +88,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../task3/" class="nav-link">
+                                <a rel="prev" href="../task5_1/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../task5/" class="nav-link">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -115,29 +115,29 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#_1" class="nav-link">Деление двух целых чисел без оператора деления</a>
+            <li class="nav-item" data-bs-level="1"><a href="#c-shortest-palindrome" class="nav-link">Кратчайший палиндром c добавлением в начало (Shortest Palindrome)</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">Описание задачи</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">Примеры</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_1" class="nav-link">Описание задачи</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#_4" class="nav-link">Ограничения</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">Примеры</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#_5" class="nav-link">Объяснение</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">Ограничения</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#_6" class="nav-link">Сложность</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_4" class="nav-link">Объяснение решения</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#_7" class="nav-link">Результат</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_5" class="nav-link">Сложность</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#_6" class="nav-link">Результат</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -148,43 +148,37 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="_1">Деление двух целых чисел без оператора деления</h1>
-<h2 id="_2">Описание задачи</h2>
-<p>Даны два целых числа — dividend (делимое) и divisor (делитель). Требуется выполнить деление, не используя операторы умножения, деления и остатка от деления (*, /, %).</p>
-<p>Результат должен быть усечён в сторону нуля, то есть дробная часть отбрасывается.</p>
-<p>Если результат выходит за пределы диапазона 32-битного знакового целого числа [-2³¹, 2³¹ − 1], необходимо вернуть крайнее допустимое значение.</p>
-<h2 id="_3">Примеры</h2>
+<h1 id="c-shortest-palindrome">Кратчайший палиндром c добавлением в начало (Shortest Palindrome)</h1>
+<h2 id="_1">Описание задачи</h2>
+<p>Дана строка s. Разрешено добавлять символы только в начало, чтобы получить палиндром.
+Нужно вернуть самый короткий возможный палиндром.</p>
+<h2 id="_2">Примеры</h2>
 <h3 id="1">Пример 1</h3>
-<p>Вход:
-dividend = 10, divisor = 3</p>
-<p>Выход:
-3</p>
-<p>Пояснение: 10 / 3 = 3.333…, после усечения остается 3.</p>
-<h3 id="2">Пример 2</h3>
-<p>Вход:
-dividend = 7, divisor = -3</p>
-<p>Выход:
--2</p>
-<p>Пояснение: 7 / -3 = -2.333…, усечение дает -2.</p>
-<h2 id="_4">Ограничения</h2>
+<p>Вход:</p>
+<pre><code>s = &quot;aacecaaa&quot;
+</code></pre>
+<p>Выход:</p>
+<pre><code>&quot;aaacecaaa&quot;
+</code></pre>
+<h2 id="_3">Ограничения</h2>
 <ul>
-<li>−2³¹ ≤ dividend, divisor ≤ 2³¹ − 1</li>
-<li>divisor ≠ 0</li>
-<li>Окружение поддерживает только 32-битные знаковые целые числа</li>
+<li>0 &lt;= s.length &lt;= 5 * 104</li>
+<li>s состоит только из английских букв нижнего регистра</li>
 </ul>
-<h2 id="_5">Объяснение</h2>
+<h2 id="_4">Объяснение решения</h2>
 <ul>
-<li>Решение использует битовые сдвиги для ускорения повторного вычитания (temp &lt;&lt;= 1 означает умножение temp на 2).</li>
-<li>Подсчитываем, сколько раз делитель может быть вычтен из делимого.</li>
-<li>После того как вычитание завершено, возвращается результат с нужным знаком.</li>
-<li>Учитывается переполнение: INT_MIN / -1 дает значение, большее допустимого диапазона.</li>
+<li>Ищем наибольший палиндромный префикс строки s.</li>
+<li>Строим строку t = s + '#' + reverse(s) и считаем для неё префикс-функцию (LPS, как в KMP).</li>
+<li>Последнее значение LPS — длина наибольшего префикса s, который совпадает с суффиксом reverse(s), то есть длина палиндромного префикса.</li>
+<li>Недостающий хвост берём как reverse(s)[:len(s)-longest] и добавляем спереди к s.</li>
 </ul>
-<h2 id="_6">Сложность</h2>
+<h2 id="_5">Сложность</h2>
 <ul>
-<li>Временная сложность: O(log N), где N — значение делимого. Мы вычитаем делитель удвоенными шагами.</li>
+<li>Время: O(n)</li>
+<li>Память: O(n)</li>
 </ul>
-<h2 id="_7">Результат</h2>
-<p><img alt="img.png" src="img.png" /></p></div>
+<h2 id="_6">Результат</h2>
+<p><img alt="img.jpg" src="img.jpg" /></p></div>
             </div>
         </div>
 
